@@ -55,6 +55,7 @@ void printProductRemainingStock(DynamicJsonDocument doc);
 void printProductOldPrice(DynamicJsonDocument doc);
 char *stringToCharArray(String s);
 void drawXLine();
+void drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, int stroke);
 
 AsyncWebServer server(80);
 boolean exec_fetch = false;
@@ -115,7 +116,6 @@ bool connectToWifi() {
 }
 
 void subscribeToRoutes() {
-  
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     int paramsNr = request->params();
     request->send(200, "text/plain", "message received");
@@ -123,8 +123,6 @@ void subscribeToRoutes() {
     product_id = p->value();
     exec_fetch=true;
   });
-  
-  
 }
 
 DynamicJsonDocument fetchData(String id) {
@@ -171,9 +169,11 @@ void setTemplate(DynamicJsonDocument doc){
     setThemeToDark(true);
     printProductName(doc);  
     setThemeToDark(false);
-    printProductPromotion(doc);
     printProductPrice(doc);  
-    printProductOldPrice(doc);
+    if(doc["promotion"].as<bool>()) {
+      printProductPromotion(doc);
+      printProductOldPrice(doc);
+    }
     printProductWeight(doc);
     printProductPricePerUnit(doc);
     printProductDate(doc);
@@ -217,23 +217,22 @@ void printProductPrice(DynamicJsonDocument doc) {
 }
 
 void printProductOldPrice(DynamicJsonDocument doc) {
-  uint16_t blockSize = 0;
+    uint16_t blockSize = 0;
     u8g2Fonts.setFont(u8g2_font_samim_16_t_all );
-    uint16_t integerBlockSize = u8g2Fonts.getUTF8Width(doc["price"]["integer"].as<char*>());
+    uint16_t integerBlockSize = u8g2Fonts.getUTF8Width(doc["old_price"]["integer"].as<char*>());
     blockSize += integerBlockSize;
     u8g2Fonts.setFont(u8g2_font_samim_12_t_all);  
-    blockSize += u8g2Fonts.getUTF8Width(doc["price"]["unit"].as<char*>());
-    uint16_t floatingBlockSize = u8g2Fonts.getUTF8Width(doc["price"]["floating"].as<char*>());
+    blockSize += u8g2Fonts.getUTF8Width(doc["old_price"]["unit"].as<char*>());
+    uint16_t floatingBlockSize = u8g2Fonts.getUTF8Width(doc["old_price"]["floating"].as<char*>());
     blockSize += floatingBlockSize;
     
     u8g2Fonts.setCursor(20, (display.height() - blockSize - 3));                          
     u8g2Fonts.setFont(u8g2_font_samim_16_t_all);
-    u8g2Fonts.print(doc["price"]["integer"].as<String>());
+    u8g2Fonts.print(doc["old_price"]["integer"].as<String>());
     u8g2Fonts.setFont(u8g2_font_samim_12_t_all);  
-    u8g2Fonts.print(doc["price"]["unit"].as<String>());
-    u8g2Fonts.print(doc["price"]["floating"].as<String>());
-
-    display.drawLine(25, display.height() - blockSize - 7, 25, display.height(), GxEPD_BLACK);
+    u8g2Fonts.print(doc["old_price"]["unit"].as<String>());
+    u8g2Fonts.print(doc["old_price"]["floating"].as<String>());
+    drawLine(25, display.height() - blockSize - 7, 25, display.height(), 1);
 }
 
 void printProductWeight(DynamicJsonDocument doc) {
@@ -277,9 +276,11 @@ void printProductDate(DynamicJsonDocument doc) {
 }
 
 void printProductPromotion(DynamicJsonDocument doc) {
-    u8g2Fonts.setCursor(33, 0);
-    u8g2Fonts.setFont(u8g2_font_sticker_mel_tr);
-    u8g2Fonts.print(doc["promotion"].as<String>());
+    
+      u8g2Fonts.setCursor(33, 0);
+      u8g2Fonts.setFont(u8g2_font_sticker_mel_tr);
+      u8g2Fonts.print("promotion");
+    
 }
 
 char *stringToCharArray(String s) {
@@ -287,18 +288,18 @@ char *stringToCharArray(String s) {
     char *char_array = new char[n + 1];
     for(int i=0; i<n; i++) {
       char_array[i] = s[i];
-      Serial.print("i:");
-      Serial.print(i);
-      Serial.print(" : ");
-      Serial.println(char_array[i]);
     }
     char_array[n] = NULL;
     return char_array;
 }
 
 void drawXLine() {
-  for(int i=0; i<=4; i++) {
-    display.drawLine(display.width() -i, 0, -i, display.height(), GxEPD_BLACK);
-    display.drawLine(-i, 0, display.width() -i, display.height(), GxEPD_BLACK);
+    drawLine(display.width(), 0, 0, display.height(), 8);
+    drawLine(0, 0, display.width(), display.height(), 8);
+}
+
+void drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, int stroke) {
+  for(int i=0; i<stroke; i++) {
+    display.drawLine(x0 -i, y0, x1 -i, y1, GxEPD_BLACK);
   }
 }
