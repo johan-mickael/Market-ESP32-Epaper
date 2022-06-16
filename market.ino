@@ -3,8 +3,8 @@
 #define LOW_RESISTOR  100000
 #define VOLT_PIN      35
 
-#define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP  300        /* Time ESP32 will go to sleep (in seconds) */
+#define uS_TO_S_FACTOR 1000000
+#define TIME_TO_SLEEP  300
 
 #include <boards.h>
 #include <GxEPD.h>
@@ -276,11 +276,9 @@ void printProductDate(DynamicJsonDocument doc) {
 }
 
 void printProductPromotion(DynamicJsonDocument doc) {
-    
-      u8g2Fonts.setCursor(33, 0);
-      u8g2Fonts.setFont(u8g2_font_sticker_mel_tr);
-      u8g2Fonts.print("promotion");
-    
+    u8g2Fonts.setCursor(33, 0);
+    u8g2Fonts.setFont(u8g2_font_sticker_mel_tr);
+    u8g2Fonts.print("promotion");
 }
 
 char *stringToCharArray(String s) {
@@ -289,7 +287,7 @@ char *stringToCharArray(String s) {
     for(int i=0; i<n; i++) {
       char_array[i] = s[i];
     }
-    char_array[n] = NULL;
+    char_array[n] = NULL;       
     return char_array;
 }
 
