@@ -198,13 +198,14 @@ void setTemplate(StaticJsonDocument<2048> doc){
 
 // Displaying a custom message on the center of the screen
 void printMessage(String message) {
-    display.fillScreen(GxEPD_WHITE);
+    display.fillScreen(GxEPD_BLACK);
     setThemeToDark(true);
     u8g2Fonts.setFont(u8g2_font_luBS18_tf); 
     uint16_t blockSize = u8g2Fonts.getUTF8Width(stringToCharArray(message));      // Calculate the width of the text message
-    u8g2Fonts.setCursor(display.width() / 2, display.height() - (blockSize/2));   // Displaying the message in the center of the screen              
+    u8g2Fonts.setCursor(display.width() / 2, (display.height()/2) - (blockSize/2));   // Displaying the message in the center of the screen              
     u8g2Fonts.print(message);
     display.update();
+    display.fillScreen(GxEPD_WHITE);
     setThemeToDark(false);
 }
 
@@ -256,7 +257,7 @@ void printProductOldPrice(StaticJsonDocument<2048> doc) {
     // End of coordinates calculation
     
     // Displaying the price on the screen
-    u8g2Fonts.setCursor(20, (display.height() - blockSize - 3));                          
+    u8g2Fonts.setCursor(20, (display.height() - blockSize - 5));                          
     u8g2Fonts.setFont(u8g2_font_samim_16_t_all);
     u8g2Fonts.print(doc["old_price"]["integer"].as<String>());
     u8g2Fonts.setFont(u8g2_font_samim_12_t_all);  
